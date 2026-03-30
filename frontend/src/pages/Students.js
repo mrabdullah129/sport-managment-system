@@ -112,7 +112,16 @@ const Students = () => {
         setImportMessage('');
       }, 1000);
     } catch (err) {
-      setImportMessage('❌ Error importing file: ' + (err.response?.data?.error || err.message));
+      const apiError = err.response?.data?.error;
+      const errorText =
+        typeof apiError === 'string'
+          ? apiError
+          : apiError?.message ||
+            err.response?.data?.message ||
+            err.message ||
+            'Unknown error';
+
+      setImportMessage('❌ Error importing file: ' + errorText);
       console.error('Error:', err);
     }
   };
