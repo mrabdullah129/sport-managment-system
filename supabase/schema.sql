@@ -22,8 +22,8 @@ create table if not exists public.transactions (
   student_id bigint not null references public.students(id) on delete restrict,
   item_id bigint not null references public.items(id) on delete restrict,
   quantity integer not null check (quantity > 0),
-  issue_date date not null,
-  return_date date,
+  issue_date timestamptz not null,
+  return_date timestamptz,
   status text not null default 'issued' check (status in ('issued', 'returned')),
   created_at timestamptz default now()
 );

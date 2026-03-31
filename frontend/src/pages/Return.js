@@ -1,6 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
+const formatDateTime = (value) => {
+  if (!value) {
+    return 'N/A';
+  }
+
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) {
+    return value;
+  }
+
+  return parsed.toLocaleString();
+};
+
 const Return = () => {
   const [issuedItems, setIssuedItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -24,13 +37,13 @@ const Return = () => {
 
   const handleReturn = async (transactionId) => {
     try {
-      const returnDate = new Date().toISOString().split('T')[0];
+      const returnDate = new Date().toISOString();
       await axios.post('/api/transactions/return', {
         transaction_id: transactionId,
         return_date: returnDate
       });
 
-      setMessage('✓ Equipment returned successfully!');
+      setMessage(`✓ Equipment returned successfully at ${new Date(returnDate).toLocaleString()}`);
       fetchIssuedItems();
       setTimeout(() => setMessage(''), 3000);
     } catch (err) {
@@ -86,9 +99,9 @@ const Return = () => {
                     <td>{item.item_name}</td>
                     <td>{item.category}</td>
                     <td>{item.quantity}</td>
-                    <td>{new Date(item.issue_date).toLocaleDateString()}</td>
+                    <td>{formatDateTime(item.issue_date)}</td>
                     <td>
-                      {item.return_date ? new Date(item.return_date).toLocaleDateString() : 'N/A'}
+                      {formatDateTime(item.return_date)}
                       {isLate && <span style={{ color: '#e74c3c' }}> (Late)</span>}
                     </td>
                     <td>

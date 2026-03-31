@@ -2,6 +2,19 @@ const express = require('express');
 const router = express.Router();
 const supabase = require('../supabase/client');
 
+const normalizeDateTimeValue = (value) => {
+  if (!value) {
+    return null;
+  }
+
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) {
+    return null;
+  }
+
+  return parsed.toISOString();
+};
+
 const mapTransactionsWithRelations = (transactions, studentsById, itemsById) => {
   return (transactions || []).map((transaction) => {
     const student = studentsById[transaction.student_id] || {};
@@ -113,6 +126,13 @@ router.post('/issue', async (req, res) => {
   const studentIdNum = Number(student_id);
   const itemIdNum = Number(item_id);
   const quantityNum = Number(quantity);
+  const normalizedIssueDate = normalizeDateTimeValue(issue_date);
+  const normalizedExpectedReturnDate = normalizeDateTimeValue(expected_return_date);
+
+  if (!normalizedIssueDate) {
+    res.status(400).json({ error: 'Invalid issue date/time format' });
+    return;
+  }
 
   const { data: item, error: itemError } = await supabase
     .from('items')
@@ -137,8 +157,8 @@ router.post('/issue', async (req, res) => {
         student_id: studentIdNum,
         item_id: itemIdNum,
         quantity: quantityNum,
-        issue_date,
-        return_date: expected_return_date || null,
+        issue_date: normalizedIssueDate,
+        return_date: normalizedExpectedReturnDate,
         status: 'issued'
       }
     ])
@@ -180,6 +200,12 @@ router.post('/return', async (req, res) => {
   }
 
   const transactionIdNum = Number(transaction_id);
+  const normalizedReturnDate = normalizeDateTimeValue(return_date);
+
+  if (!normalizedReturnDate) {
+    res.status(400).json({ error: 'Invalid return date/time format' });
+    return;
+  }
 
   const { data: transaction, error: txError } = await supabase
     .from('transactions')
@@ -196,7 +222,7 @@ router.post('/return', async (req, res) => {
   const { error: updateTransError } = await supabase
     .from('transactions')
     .update({
-      return_date,
+      return_date: normalizedReturnDate,
       status: 'returned'
     })
     .eq('id', transactionIdNum);
