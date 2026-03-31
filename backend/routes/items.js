@@ -54,8 +54,14 @@ router.get('/stats/overview', async (req, res) => {
 
   const totals = (data || []).reduce(
     (acc, item) => {
-      acc.totalItems += Number(item.total_quantity || 0);
-      acc.availableItems += Number(item.available_quantity || 0);
+      const totalQty = Number(item.total_quantity || 0);
+      const availableQty = Math.min(
+        totalQty,
+        Math.max(0, Number(item.available_quantity || 0))
+      );
+
+      acc.totalItems += totalQty;
+      acc.availableItems += availableQty;
       return acc;
     },
     { totalItems: 0, availableItems: 0 }

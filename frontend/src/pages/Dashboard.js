@@ -19,10 +19,15 @@ const Dashboard = () => {
       const itemsRes = await axios.get('/api/items/stats/overview');
       const studentsRes = await axios.get('/api/students/stats/count');
 
+      const totalItems = Number(itemsRes.data.totalItems) || 0;
+      const rawAvailable = Number(itemsRes.data.availableItems) || 0;
+      const availableItems = Math.min(totalItems, Math.max(0, rawAvailable));
+      const issuedItems = Math.max(0, totalItems - availableItems);
+
       setStats({
-        totalItems: itemsRes.data.totalItems || 0,
-        issuedItems: itemsRes.data.issuedItems || 0,
-        availableItems: itemsRes.data.availableItems || 0,
+        totalItems,
+        issuedItems,
+        availableItems,
         activeStudents: studentsRes.data.activeStudents || 0
       });
     } catch (err) {

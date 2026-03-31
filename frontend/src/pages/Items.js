@@ -119,38 +119,38 @@ const Items = () => {
                 const issuedQuantity = Math.max(0, totalQuantity - availableQuantity);
 
                 return (
-                <tr key={item.id}>
-                  <td>{item.name}</td>
-                  <td>{item.category}</td>
-                  <td>{totalQuantity}</td>
-                  <td>
-                    <span style={{ color: '#27ae60', fontWeight: 'bold' }}>
-                      {availableQuantity}
-                    </span>
-                  </td>
-                  <td>
-                    <span style={{ color: '#e74c3c', fontWeight: 'bold' }}>
-                      {issuedQuantity}
-                    </span>
-                  </td>
-                  <td>
-                    <button
-                      className="btn btn-primary btn-sm"
-                      onClick={() => {
-                        setEditingItem(item);
-                        setShowForm(true);
-                      }}
-                    >
-                      ✏️ Edit
-                    </button>
-                    <button
-                      className="btn btn-danger btn-sm"
-                      onClick={() => handleDelete(item.id)}
-                    >
-                      🗑️ Delete
-                    </button>
-                  </td>
-                </tr>
+                  <tr key={item.id}>
+                    <td>{item.name}</td>
+                    <td>{item.category}</td>
+                    <td>{totalQuantity}</td>
+                    <td>
+                      <span style={{ color: '#27ae60', fontWeight: 'bold' }}>
+                        {availableQuantity}
+                      </span>
+                    </td>
+                    <td>
+                      <span style={{ color: '#e74c3c', fontWeight: 'bold' }}>
+                        {issuedQuantity}
+                      </span>
+                    </td>
+                    <td>
+                      <button
+                        className="btn btn-primary btn-sm"
+                        onClick={() => {
+                          setEditingItem(item);
+                          setShowForm(true);
+                        }}
+                      >
+                        ✏️ Edit
+                      </button>
+                      <button
+                        className="btn btn-danger btn-sm"
+                        onClick={() => handleDelete(item.id)}
+                      >
+                        🗑️ Delete
+                      </button>
+                    </td>
+                  </tr>
                 );
               })}
             </tbody>
