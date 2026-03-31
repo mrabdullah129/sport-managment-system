@@ -15,6 +15,8 @@ const normalizeDateTimeValue = (value) => {
   return parsed.toISOString();
 };
 
+const isPositiveInteger = (value) => Number.isInteger(value) && value > 0;
+
 const mapTransactionsWithRelations = (transactions, studentsById, itemsById) => {
   return (transactions || []).map((transaction) => {
     const student = studentsById[transaction.student_id] || {};
@@ -129,6 +131,16 @@ router.post('/issue', async (req, res) => {
   const normalizedIssueDate = normalizeDateTimeValue(issue_date);
   const normalizedExpectedReturnDate = normalizeDateTimeValue(expected_return_date);
 
+  if (!isPositiveInteger(studentIdNum) || !isPositiveInteger(itemIdNum)) {
+    res.status(400).json({ error: 'Invalid student or item id' });
+    return;
+  }
+
+  if (!isPositiveInteger(quantityNum)) {
+    res.status(400).json({ error: 'Quantity must be a whole number greater than 0' });
+    return;
+  }
+
   if (!normalizedIssueDate) {
     res.status(400).json({ error: 'Invalid issue date/time format' });
     return;
@@ -202,6 +214,11 @@ router.post('/return', async (req, res) => {
   const transactionIdNum = Number(transaction_id);
   const normalizedReturnDate = normalizeDateTimeValue(return_date);
 
+  if (!isPositiveInteger(transactionIdNum)) {
+    res.status(400).json({ error: 'Invalid transaction id' });
+    return;
+  }
+
   if (!normalizedReturnDate) {
     res.status(400).json({ error: 'Invalid return date/time format' });
     return;
@@ -234,7 +251,7 @@ router.post('/return', async (req, res) => {
 
   const { data: item, error: itemError } = await supabase
     .from('items')
-    .select('id,available_quantity')
+    .select('id,total_quantity,available_quantity')
     .eq('id', transaction.item_id)
     .maybeSingle();
 
@@ -243,10 +260,17 @@ router.post('/return', async (req, res) => {
     return;
   }
 
+  const updatedAvailable = Number(item.available_quantity) + Number(transaction.quantity);
+
+  if (updatedAvailable > Number(item.total_quantity)) {
+    res.status(400).json({ error: 'Return would make available quantity exceed total quantity. Please fix item data first.' });
+    return;
+  }
+
   const { error: updateItemError } = await supabase
     .from('items')
     .update({
-      available_quantity: Number(item.available_quantity) + Number(transaction.quantity)
+      available_quantity: updatedAvailable
     })
     .eq('id', transaction.item_id);
 

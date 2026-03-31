@@ -1,19 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const formatDateTime = (value) => {
-  if (!value) {
-    return 'Pending';
-  }
-
-  const parsed = new Date(value);
-  if (Number.isNaN(parsed.getTime())) {
-    return value;
-  }
-
-  return parsed.toLocaleString();
-};
-
 const Reports = () => {
   const [transactions, setTransactions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -49,8 +36,8 @@ const Reports = () => {
         t.item_name,
         t.category,
         t.quantity,
-        formatDateTime(t.issue_date),
-        formatDateTime(t.return_date),
+        new Date(t.issue_date).toLocaleDateString(),
+        t.return_date ? new Date(t.return_date).toLocaleDateString() : 'Pending',
         t.status
       ])
     ];
@@ -124,8 +111,12 @@ const Reports = () => {
                   <td>{transaction.item_name}</td>
                   <td>{transaction.category}</td>
                   <td>{transaction.quantity}</td>
-                  <td>{formatDateTime(transaction.issue_date)}</td>
-                  <td>{formatDateTime(transaction.return_date)}</td>
+                  <td>{new Date(transaction.issue_date).toLocaleDateString()}</td>
+                  <td>
+                    {transaction.return_date
+                      ? new Date(transaction.return_date).toLocaleDateString()
+                      : 'Pending'}
+                  </td>
                   <td>
                     <span
                       style={{

@@ -1,12 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const getLocalDateTimeInputValue = () => {
-  const now = new Date();
-  const timezoneOffsetMs = now.getTimezoneOffset() * 60000;
-  return new Date(now.getTime() - timezoneOffsetMs).toISOString().slice(0, 16);
-};
-
 const Issue = () => {
   const [students, setStudents] = useState([]);
   const [items, setItems] = useState([]);
@@ -14,7 +8,7 @@ const Issue = () => {
     student_id: '',
     item_id: '',
     quantity: '',
-    issue_date: getLocalDateTimeInputValue(),
+    issue_date: new Date().toISOString().split('T')[0],
     expected_return_date: ''
   });
   const [message, setMessage] = useState('');
@@ -52,25 +46,19 @@ const Issue = () => {
     setMessage('');
 
     try {
-      const selectedItem = items.find((item) => item.id === parseInt(formData.item_id, 10));
-      const payload = {
+      await axios.post('/api/transactions/issue', {
         ...formData,
         student_id: parseInt(formData.student_id),
         item_id: parseInt(formData.item_id),
         quantity: parseInt(formData.quantity)
-      };
+      });
 
-      await axios.post('/api/transactions/issue', payload);
-
-      const issuedAtText = new Date(payload.issue_date).toLocaleString();
-      const itemText = selectedItem ? selectedItem.name : 'Equipment';
-
-      setMessage(`✓ ${itemText} issued successfully at ${issuedAtText}`);
+      setMessage('✓ Equipment issued successfully!');
       setFormData({
         student_id: '',
         item_id: '',
         quantity: '',
-        issue_date: getLocalDateTimeInputValue(),
+        issue_date: new Date().toISOString().split('T')[0],
         expected_return_date: ''
       });
 
@@ -152,7 +140,7 @@ const Issue = () => {
           <div className="form-group">
             <label>Issue Date *</label>
             <input
-              type="datetime-local"
+              type="date"
               name="issue_date"
               value={formData.issue_date}
               onChange={handleChange}
@@ -161,9 +149,9 @@ const Issue = () => {
           </div>
 
           <div className="form-group">
-            <label>Expected Return Date & Time</label>
+            <label>Expected Return Date</label>
             <input
-              type="datetime-local"
+              type="date"
               name="expected_return_date"
               value={formData.expected_return_date}
               onChange={handleChange}

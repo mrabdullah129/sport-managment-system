@@ -12,8 +12,8 @@ create table if not exists public.items (
   id bigint generated always as identity primary key,
   name text not null,
   category text not null,
-  total_quantity integer not null check (total_quantity >= 0),
-  available_quantity integer not null check (available_quantity >= 0),
+  total_quantity integer not null check (total_quantity > 0),
+  available_quantity integer not null check (available_quantity >= 0 and available_quantity <= total_quantity),
   created_at timestamptz default now()
 );
 
@@ -32,3 +32,11 @@ create index if not exists idx_transactions_student_status on public.transaction
 create index if not exists idx_transactions_item_status on public.transactions(item_id, status);
 create index if not exists idx_students_roll on public.students(roll_no);
 create index if not exists idx_items_category on public.items(category);
+
+alter table public.items
+  drop constraint if exists items_total_quantity_check,
+  drop constraint if exists items_available_quantity_check;
+
+alter table public.items
+  add constraint items_total_quantity_check check (total_quantity > 0),
+  add constraint items_available_quantity_check check (available_quantity >= 0 and available_quantity <= total_quantity);

@@ -98,6 +98,11 @@ router.post('/', async (req, res) => {
 
   const parsedTotal = Number(total_quantity);
 
+  if (!isPositiveInteger(parsedTotal)) {
+    res.status(400).json({ error: 'Total quantity must be a whole number greater than 0' });
+    return;
+  }
+
   const { data, error } = await supabase
     .from('items')
     .insert([
