@@ -64,7 +64,7 @@ router.get('/stats/overview', async (req, res) => {
   res.json({
     totalItems: totals.totalItems,
     availableItems: totals.availableItems,
-    issuedItems: totals.totalItems - totals.availableItems
+    issuedItems: Math.max(0, totals.totalItems - totals.availableItems)
   });
 });
 

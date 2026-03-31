@@ -110,19 +110,27 @@ const Items = () => {
               </tr>
             </thead>
             <tbody>
-              {items.map((item) => (
+              {items.map((item) => {
+                const totalQuantity = Number(item.total_quantity) || 0;
+                const availableQuantity = Math.min(
+                  totalQuantity,
+                  Math.max(0, Number(item.available_quantity) || 0)
+                );
+                const issuedQuantity = Math.max(0, totalQuantity - availableQuantity);
+
+                return (
                 <tr key={item.id}>
                   <td>{item.name}</td>
                   <td>{item.category}</td>
-                  <td>{item.total_quantity}</td>
+                  <td>{totalQuantity}</td>
                   <td>
                     <span style={{ color: '#27ae60', fontWeight: 'bold' }}>
-                      {item.available_quantity}
+                      {availableQuantity}
                     </span>
                   </td>
                   <td>
                     <span style={{ color: '#e74c3c', fontWeight: 'bold' }}>
-                      {item.total_quantity - item.available_quantity}
+                      {issuedQuantity}
                     </span>
                   </td>
                   <td>
@@ -143,7 +151,8 @@ const Items = () => {
                     </button>
                   </td>
                 </tr>
-              ))}
+                );
+              })}
             </tbody>
           </table>
         ) : (
