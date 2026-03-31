@@ -260,12 +260,27 @@ router.post('/return', async (req, res) => {
     return;
   }
 
-  const updatedAvailable = Number(item.available_quantity) + Number(transaction.quantity);
+  const { data: openTransactions, error: openTxError } = await supabase
+    .from('transactions')
+    .select('id,quantity')
+    .eq('item_id', transaction.item_id)
+    .eq('status', 'issued');
 
-  if (updatedAvailable > Number(item.total_quantity)) {
-    res.status(400).json({ error: 'Return would make available quantity exceed total quantity. Please fix item data first.' });
+  if (openTxError) {
+    res.status(400).json({ error: openTxError.message });
     return;
   }
+
+  const openIssuedQty = (openTransactions || []).reduce(
+    (sum, row) => sum + Number(row.quantity || 0),
+    0
+  );
+  const totalQty = Number(item.total_quantity || 0);
+  const normalizedAvailableBeforeReturn = Math.max(0, totalQty - openIssuedQty);
+  const updatedAvailable = Math.min(
+    totalQty,
+    normalizedAvailableBeforeReturn + Number(transaction.quantity || 0)
+  );
 
   const { error: updateItemError } = await supabase
     .from('items')

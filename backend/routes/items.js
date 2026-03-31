@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const supabase = require('../supabase/client');
 
+const isPositiveInteger = (value) => Number.isInteger(value) && value > 0;
+
 router.get('/', async (req, res) => {
   const { data, error } = await supabase
     .from('items')
