@@ -12,14 +12,16 @@ import Reports from './pages/Reports';
 import About from './pages/About';
 
 function App() {
-  const [sidebarOpen, setSidebarOpen] = React.useState(true);
+  const [sidebarOpen, setSidebarOpen] = React.useState(false);
+  const closeSidebar = () => setSidebarOpen(false);
 
   return (
     <Router>
       <div className="app-container">
         <Navbar toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
+        {sidebarOpen && <div className="sidebar-overlay" onClick={closeSidebar} />}
         <div className="app-body">
-          {sidebarOpen && <Sidebar />}
+          <Sidebar isOpen={sidebarOpen} onNavigate={closeSidebar} onClose={closeSidebar} />
           <main className="app-main">
             <Routes>
               <Route path="/" element={<Dashboard />} />
