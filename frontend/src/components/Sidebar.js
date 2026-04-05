@@ -41,6 +41,11 @@ const Sidebar = () => {
             📊 Reports
           </Link>
         </li>
+        <li>
+          <Link to="/about" className={isActive('/about')}>
+            ℹ️ About
+          </Link>
+        </li>
       </ul>
     </aside>
   );

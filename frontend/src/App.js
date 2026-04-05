@@ -9,6 +9,7 @@ import Items from './pages/Items';
 import Issue from './pages/Issue';
 import Return from './pages/Return';
 import Reports from './pages/Reports';
+import About from './pages/About';
 
 function App() {
   const [sidebarOpen, setSidebarOpen] = React.useState(true);
@@ -27,6 +28,7 @@ function App() {
               <Route path="/issue" element={<Issue />} />
               <Route path="/return" element={<Return />} />
               <Route path="/reports" element={<Reports />} />
+              <Route path="/about" element={<About />} />
             </Routes>
           </main>
         </div>
